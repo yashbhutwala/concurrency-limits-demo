@@ -25,7 +25,7 @@ He illustrated where rate limiting can break down using
 In the examples client sends 5 requests per second using 10 workers
 which wait for a response no longer than 2.5 seconds.
 
-```sh
+```shell script
 $ ./client -worker=10 -rps=5 -origin=http://origin:8000
 ```
 
@@ -33,7 +33,7 @@ Origin server has an SLO to serve 99% of requests within 1 second.
 It has fixed number of workers, each takes 1 second on average to process a request.
 Requests are enqueued when workers are busy and discarded when the queue is full.
 
-```sh
+```shell script
 $ ./origin -worker=7 -worktime=1s -queue=100
 ```
 
@@ -65,31 +65,25 @@ if bucket boundaries were not chosen appropriately (sharp spikes).
 
 Clone the repository.
 
-```sh
+```shell script
 $ git clone https://github.com/ybhutdocker/concurrency-limits-demo.git
-$ cd ./capacity/docker
+$ cd ./concurrency-limits-demo/docker
 ```
 
 Run origin server, client (load generator), Grafana, and Prometheus using Docker Compose.
 
-```sh
-$ docker-machine start
-$ eval "$(docker-machine env)"
-$ docker-compose up
-$ docker-machine ip
-192.168.99.100
+```shell script
+$ docker-compose up -d
 ```
 
-Open Grafana http://192.168.99.100:3000 with default credentials admin/admin.
-Prometheus dashboard is available at http://192.168.99.100:9090.
+Open Grafana [http://localhost:3000](http://localhost:3000) with default credentials admin/admin.
+Prometheus dashboard is available at [http://localhost:9090](http://localhost:9090).
 
 Clean up once you've done experimenting.
 
-```sh
+```shell script
 $ docker-compose down
-$ docker rmi ybhutdocker/capacity
 $ docker image prune --filter label=stage=intermediate
-$ docker-machine stop
 ```
 
 ## Experiments
@@ -98,8 +92,8 @@ $ docker-machine stop
 
 New release of origin server has a bug that made workers process a request within 2 seconds.
 
-```sh
-$ ORIGIN_WORKTIME=2s docker-compose up
+```shell script
+$ ORIGIN_WORKTIME=2s docker-compose up -d
 ```
 
 According to Little's law, origin should be able to handle 3.5 requests per second.
@@ -134,8 +128,8 @@ Observations:
 Developers increased number of origin workers to 20 while they investigate
 why a worker takes 2 seconds to process a request instead of 1 second.
 
-```sh
-$ ORIGIN_WORKER=20 ORIGIN_WORKTIME=2s docker-compose up
+```shell script
+$ ORIGIN_WORKER=20 ORIGIN_WORKTIME=2s docker-compose up -d
 ```
 
 According to Little's law, origin should be able to handle 10 requests per second.
@@ -178,8 +172,8 @@ X = 5/2 = 2.5 rps
 In order to allow a service to recover, a client is forced to back-off: send 2.5 rps instead of 5 rps.
 Proxy limits concurrency (how many requests are in flight), not request rate (rps).
 
-```sh
-$ ORIGIN_WORKTIME=2s CLIENT_ORIGIN=http://proxy:7000 docker-compose up
+```shell script
+$ ORIGIN_WORKTIME=2s CLIENT_ORIGIN=http://proxy:7000 docker-compose up -d
 ```
 
 Observations:
@@ -233,8 +227,8 @@ N = 3.5 rps * 2.5s = 8.75 requests in flight
 
 Performance of my naive proxy is inferior and results don't correspond to Jon Moore's chart (Nginx/Lua).
 
-```sh
-$ ORIGIN_WORKTIME=2s CLIENT_ORIGIN=http://proxy:7000 PROXY_ADAPTIVE=true docker-compose up
+```shell script
+$ ORIGIN_WORKTIME=2s CLIENT_ORIGIN=http://proxy:7000 PROXY_ADAPTIVE=true docker-compose up -d
 ```
 
 Observations:

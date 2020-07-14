@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"sync/atomic"
 
+	// "github.com/platinummonkey/go-concurrency-limits/core"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
@@ -83,6 +84,9 @@ func main() {
 		fmt.Fprint(rw, "🚦\n")
 	})
 	http.ListenAndServe(*addr, nil)
+
+	// core.Limiter()
+
 }
 
 // Quota is a limited quantity of requests allowed to be in-flight.
