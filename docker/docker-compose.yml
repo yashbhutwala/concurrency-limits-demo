@@ -19,20 +19,20 @@ services:
     build:
       dockerfile: docker/Dockerfile
       context: ./..
-    image: ybhutdocker/concurrency-limits-demo-origin
+    image: ybhutdocker/concurrency-limits-demo
     command: /bin/origin -worker=${ORIGIN_WORKER} -worktime=${ORIGIN_WORKTIME} -queue=${ORIGIN_QUEUE}
 
   client:
     depends_on:
       - origin
       - proxy
-    image: ybhutdocker/concurrency-limits-demo-client
+    image: ybhutdocker/concurrency-limits-demo
     command: /bin/client -worker=${CLIENT_WORKER} -rps=${CLIENT_RPS} -origin=${CLIENT_ORIGIN}
 
   proxy:
     depends_on:
       - origin
-    image: ybhutdocker/concurrency-limits-demo-proxy
+    image: ybhutdocker/concurrency-limits-demo
     command: /bin/proxy -quota=${PROXY_QUOTA} -adaptive=${PROXY_ADAPTIVE} -origin=http://origin:8000
     environment:
       - GOMAXPROCS=4
