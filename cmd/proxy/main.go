@@ -13,7 +13,7 @@ import (
 	"runtime"
 	"sync/atomic"
 
-	// "github.com/platinummonkey/go-concurrency-limits/core"
+	"github.com/platinummonkey/go-concurrency-limits/strategy"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
@@ -48,6 +48,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("proxy: failed to parse origin url: %v", err)
 	}
+
+	strategy.NewSimpleStrategy(int(*quota))
+
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	proxy.ModifyResponse = func(resp *http.Response) error {
 		if !*adaptive {
@@ -85,7 +88,6 @@ func main() {
 	})
 	http.ListenAndServe(*addr, nil)
 
-	// core.Limiter()
 
 }
 
